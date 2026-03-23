@@ -356,15 +356,38 @@ async def calc_hours(gid: str) -> float:
 async def on_ready():
     print(f"✅ {bot.user} | Guild: {GUILD_ID}")
     print(f"⭐ Super Admins: {SUPER_ADMIN_IDS}")
+    print(f"📋 السيرفرات: {[g.name for g in bot.guilds]}")
     try:
+        # امسح الأوامر القديمة وأعد sync
+        tree.clear_commands(guild=guild_obj())
         synced = await tree.sync(guild=guild_obj())
-        print(f"✅ {len(synced)} أمر")
+        print(f"✅ {len(synced)} أمر تم sync بنجاح")
+        for cmd in synced:
+            print(f"   /{cmd.name}")
+    except discord.Forbidden as e:
+        print(f"❌ Forbidden — تأكد البوت في السيرفر وعنده صلاحية applications.commands: {e}")
+    except discord.HTTPException as e:
+        print(f"❌ HTTP error أثناء sync: {e}")
     except Exception as e:
         print(f"❌ sync error: {e}")
     await load_permissions()
     if not daily_report.is_running():    daily_report.start()
     if not hours_check.is_running():     hours_check.start()
     if not weekly_reminder.is_running(): weekly_reminder.start()
+
+
+@bot.command(name="sync")
+async def force_sync(ctx):
+    """أمر طوارئ لـ sync الأوامر يدوياً — !sync في الشات"""
+    if ctx.author.id not in SUPER_ADMIN_IDS and not ctx.author.guild_permissions.administrator:
+        return await ctx.send("❌ ما عندك صلاحية")
+    await ctx.send("⏳ جاري sync الأوامر...")
+    try:
+        tree.clear_commands(guild=discord.Object(id=ctx.guild.id))
+        synced = await tree.sync(guild=discord.Object(id=ctx.guild.id))
+        await ctx.send(f"✅ تم sync **{len(synced)}** أمر بنجاح!")
+    except Exception as e:
+        await ctx.send(f"❌ فشل sync: {e}")
 
 # ══════════════════════════════════════════
 #  أوامر العسكري الشخصية (متاحة للجميع)
