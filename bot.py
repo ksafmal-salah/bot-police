@@ -21,7 +21,7 @@ def _int(k, d="0"):
     try: return int(os.getenv(k, d))
     except: return 0
 
-GUILD_ID           = _int("GUILD_ID",          "1482934172980084911")
+GUILD_ID           = _int("GUILD_ID",          "1483226560973770885")
 ROLE_CAN_PROMOTE   = _int("ROLE_CAN_PROMOTE",  "1482934455671721994")
 ROLE_CAN_VIOLATE   = _int("ROLE_CAN_VIOLATE",  "0")
 CHANNEL_REPORTS    = _int("CHANNEL_REPORTS",   "1482934174062084260")
